@@ -14,7 +14,7 @@ import java.util.List;
 public class CheckController {
     private final PlugRepository plugRepository;
 
-    @GetMapping("/plug")
+    @GetMapping("/check/plug")
     public ResponseEntity<List<Plug>> plug(){
         List<Plug> result = plugRepository.findAll();
         return ResponseEntity.ok(result);
