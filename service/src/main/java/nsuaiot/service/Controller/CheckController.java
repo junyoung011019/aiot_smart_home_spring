@@ -1,23 +1,28 @@
 package nsuaiot.service.Controller;
 
 import lombok.RequiredArgsConstructor;
-import nsuaiot.service.Entity.Plug;
-import nsuaiot.service.Repository.PlugRepository;
+import nsuaiot.service.DTO.PlugActionRequest;
+import nsuaiot.service.Service.CheckService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
+@RequestMapping("/check")
 public class CheckController {
-    private final PlugRepository plugRepository;
 
-    @GetMapping("/check/plug")
-    public ResponseEntity<List<Plug>> plug(){
-        List<Plug> result = plugRepository.findAll();
-        return ResponseEntity.ok(result);
+    private final CheckService checkService;
+
+    @GetMapping("/plugList")
+    public ResponseEntity<String> checkPlugList(){
+        return checkService.checkPlugList();
     }
 
+    @GetMapping("/plugState/{plugId}")
+    public ResponseEntity<String> checkPlug(@PathVariable String plugId){
+        return checkService.checkPlug(plugId);
+    }
 }

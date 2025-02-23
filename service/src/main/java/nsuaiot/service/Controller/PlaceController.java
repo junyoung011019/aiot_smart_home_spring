@@ -1,7 +1,0 @@
-package nsuaiot.service.Controller;
-
-import org.springframework.stereotype.Controller;
-
-@Controller
-public class PlaceController {
-}
