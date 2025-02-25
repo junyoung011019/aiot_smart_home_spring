@@ -24,6 +24,11 @@ public class GroupController {
     public ResponseEntity<String> groupCreate(@RequestBody GroupNameRequest groupNameRequest){
         return groupService.groupCreate(groupNameRequest.getGroupName());
     }
+
+    @GetMapping("/remove/{groupId}")
+    public ResponseEntity<String> groupRemove(@PathVariable String groupId){
+        return groupService.groupRemove(groupId);
+    }
     
 
 

@@ -3,6 +3,7 @@ package nsuaiot.service.Service;
 import lombok.RequiredArgsConstructor;
 import nsuaiot.service.Entity.GroupList;
 import nsuaiot.service.Entity.GroupPlugManagement;
+import nsuaiot.service.Entity.Plug;
 import nsuaiot.service.Repository.GroupListRepository;
 import nsuaiot.service.Repository.GroupPlugManagementRepository;
 import nsuaiot.service.Repository.PlugRepository;
@@ -83,25 +84,33 @@ public class GroupActionService {
     public ResponseEntity<String> checkAction(Long groupId){
 
         List<GroupPlugManagement> groupData = groupPlugManagementRepository.findByGroupId(groupId);
+        Optional<GroupList> group = groupListRepository.findById(groupId);
 
-        if(!groupListRepository.existsById(groupId)){
+        if(group.isEmpty()){
             return ResponseEntity.status(404).body("그룹이 존재하지 않습니다!");
         }
 
-        if(groupData.size()==0){
+        if(groupData.isEmpty()){
             return ResponseEntity.status(204).body(" ");
         }
 
-        JSONArray groupDataArray =new JSONArray();
+        JSONArray groupDataArray = new JSONArray();
+        JSONObject groupObject = new JSONObject()
+                .put("groupName", group.get().getGroupName())
+                .put("groupId", group.get().getGroupId());
 
-        for(int i=0;i<groupData.size();i++){
-            GroupPlugManagement groupAction =groupData.get(i);
-            JSONObject data =new JSONObject()
-                            .put("groupId",groupAction.getGroupId())
-                            .put("plugControl",groupAction.getAction())
-                            .put("plugId",groupAction.getPlugId());
-            groupDataArray.put(data);
+        JSONArray plugArray = new JSONArray();
+        for (GroupPlugManagement groupAction : groupData) {
+            String plugId= groupAction.getPlugId();
+            Optional<Plug> plugData=plugRepository.findByPlugId(plugId);
+            JSONObject plugAction = new JSONObject()
+                    .put("plugName",plugData.get().plugName)
+                    .put("plugId", plugId)
+                    .put("plugControl", groupAction.getAction());
+            plugArray.put(plugAction);
         }
+        groupDataArray.put(groupObject);
+        groupObject.put("plug", plugArray);
 
         return ResponseEntity.ok().body(groupDataArray.toString());
     }
@@ -112,15 +121,17 @@ public class GroupActionService {
         }
 
         List<GroupPlugManagement> groupPlugManagements = groupPlugManagementRepository.findByGroupId(groupId);
-        if(groupPlugManagements.size()==0){
-            return ResponseEntity.ok().body("그룹에 등록된 액션이 없습니다");
+        if(groupPlugManagements.isEmpty()){
+            return ResponseEntity.status(204).body(" ");
         }
         System.out.println(groupPlugManagements);
 
         String url = "https://goqual.io/openapi/control/";
-        String requestBody=new String();
+        String requestBody;
         int successCount=0;
+        JSONArray successArray = new JSONArray();
         int errorCount=0;
+        JSONArray errorArray = new JSONArray();
 
         try{
             for(int i=0; i<groupPlugManagements.size();i++){
@@ -145,12 +156,23 @@ public class GroupActionService {
 
                 ResponseEntity<String> postResult = postPlugControl(action.getPlugId(),requestBody);
                 if(postResult.getStatusCode().is2xxSuccessful()){
+                    String controlPlugId = action.getPlugId();
+                    String controlPlugName = plugRepository.findByPlugId(controlPlugId).get().plugName;
+                    successArray.put(controlPlugName);
                     successCount+=1;
                 }else {
+                    String controlPlugId = action.getPlugId();
+                    String controlPlugName = plugRepository.findByPlugId(controlPlugId).get().plugName;
+                    errorArray.put(controlPlugName);
                     errorCount+=1;
                 }
             }
-            return ResponseEntity.ok().body(successCount+"개의 기기가 작동 되었고, "+errorCount+"개의 기기가 작동 실패 했습니다.");
+            JSONObject returnData = new JSONObject();
+            returnData.put("successCount",successCount)
+                    .put("successArray",successArray)
+                    .put("errorCount",errorCount)
+                    .put("errorArray",errorArray);
+            return ResponseEntity.ok().body(returnData.toString());
         }catch (Exception e){
             return ResponseEntity.status(500).body("서버 에러 발생");
         }

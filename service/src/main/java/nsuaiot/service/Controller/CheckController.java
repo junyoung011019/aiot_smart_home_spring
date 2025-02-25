@@ -25,4 +25,5 @@ public class CheckController {
     public ResponseEntity<String> checkPlug(@PathVariable String plugId){
         return checkService.checkPlug(plugId);
     }
+
 }

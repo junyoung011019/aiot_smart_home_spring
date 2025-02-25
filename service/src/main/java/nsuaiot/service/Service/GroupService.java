@@ -3,6 +3,7 @@ package nsuaiot.service.Service;
 import lombok.RequiredArgsConstructor;
 import nsuaiot.service.Entity.GroupList;
 import nsuaiot.service.Entity.GroupPlugManagement;
+import nsuaiot.service.Entity.Plug;
 import nsuaiot.service.Repository.GroupListRepository;
 import nsuaiot.service.Repository.GroupPlugManagementRepository;
 import nsuaiot.service.Repository.PlugRepository;
@@ -46,5 +47,19 @@ public class GroupService {
         return ResponseEntity.ok().body("그룹 생성 완료");
     }
 
+    public ResponseEntity<String> groupRemove(String groupId){
+        if(!groupListRepository.existsById(Long.valueOf(groupId))){
+            return ResponseEntity.status(404).body("그룹이 존재하지 않습니다.");
+        }
+        List<GroupPlugManagement> deletePlugs = groupPlugManagementRepository.findByGroupId(Long.valueOf(groupId));
+        try {
+            groupPlugManagementRepository.deleteAll(deletePlugs);
+            groupListRepository.deleteById(Long.valueOf(groupId));
+            return ResponseEntity.ok().body("그룹 삭제 완료");
+        }catch (Exception e){
+            return ResponseEntity.status(500).body("서버 오류");
+        }
+
+    }
 
 }
