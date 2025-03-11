@@ -1,7 +1,6 @@
 package nsuaiot.service.Controller;
 
 import lombok.RequiredArgsConstructor;
-import nsuaiot.service.DTO.AddActionRequest;
 import nsuaiot.service.DTO.GroupNameRequest;
 import nsuaiot.service.Service.GroupService;
 import org.springframework.http.ResponseEntity;

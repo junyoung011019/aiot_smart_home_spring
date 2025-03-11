@@ -55,31 +55,37 @@ public class GroupActionService {
     private final GroupPlugManagementRepository groupPlugManagementRepository;
     private final PlugRepository plugRepository;
 
-    public ResponseEntity<String> addAction(Long groupId, List<Map<String, String>> devices){
+    public ResponseEntity<String> editAction(Long groupId, List<Map<String, String>> devices){
         if(!groupListRepository.existsById(groupId)){
             return ResponseEntity.status(404).body("그룹 id값이 올바르지 않습니다.");
         }
 
-        List<GroupPlugManagement> saveList = new ArrayList<>();
-
+        List<GroupPlugManagement> saveList = groupPlugManagementRepository.findByGroupId(groupId);
         for(Map<String, String> device : devices){
             String plugId = device.get("plugId");
             String plugControl = device.get("action");
-            GroupPlugManagement newAction=new GroupPlugManagement(groupId, plugId, plugControl);
 
             if(!plugRepository.findByPlugId(plugId).isPresent()){
                 return ResponseEntity.status(404).body("플러그 "+plugId+"가 존재하지 않습니다!");
             }
 
-            //같은 그룹 아이디에 같은 플러그 제어 있는지 확인해야함
-            if(groupPlugManagementRepository.findByGroupIdAndPlugId(groupId, plugId).isPresent()){
-                return ResponseEntity.status(400).body("해당 그룹에서 플러그 "+plugId+"의 동작이 이미 선언 되어있습니다!");
+            int change=0;
+            for(int i =0; i<saveList.size();i++){
+                if(saveList.get(i).getPlugId().equals(plugId)) {
+                    saveList.get(i).setAction(plugControl);
+                    change += 1;
+                }
             }
-            saveList.add(newAction);
+
+            if(change==0){
+                GroupPlugManagement newAction=new GroupPlugManagement(groupId, plugId, plugControl);
+                groupPlugManagementRepository.save(newAction);
+            }
         }
-        groupPlugManagementRepository.saveAll(saveList);
-        return ResponseEntity.ok().body("해당 그룹에 액션이 추가가 완료되었습니다.");
+        return ResponseEntity.ok().body("해당 그룹에 액션이 추가 / 수정이 완료되었습니다.");
     }
+
+
 
     public ResponseEntity<String> checkAction(Long groupId){
 

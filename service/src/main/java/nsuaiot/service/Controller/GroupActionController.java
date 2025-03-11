@@ -1,10 +1,9 @@
 package nsuaiot.service.Controller;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import nsuaiot.service.DTO.AddActionRequest;
-import nsuaiot.service.DTO.GroupNameRequest;
+import nsuaiot.service.DTO.EditActionRequest;
 import nsuaiot.service.Service.GroupActionService;
-import nsuaiot.service.Service.GroupService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +15,10 @@ public class GroupActionController {
 
     private final GroupActionService groupActionService;
 
-    @PostMapping("/add")
-    public ResponseEntity<String> addAction(@RequestBody AddActionRequest addActionRequest){
-        return groupActionService.addAction(addActionRequest.getGroupId(),addActionRequest.getDevices());
+    @PostMapping("/edit")
+    @Transactional
+    public ResponseEntity<String> editAction(@RequestBody EditActionRequest editActionRequest){
+        return groupActionService.editAction(editActionRequest.getGroupId(),editActionRequest.getDevices());
     }
 
     @GetMapping("/check/{groupId}")

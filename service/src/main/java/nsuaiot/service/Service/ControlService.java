@@ -1,6 +1,7 @@
 package nsuaiot.service.Service;
 
 import lombok.RequiredArgsConstructor;
+import nsuaiot.service.Repository.PlugRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ControlService {
 
+    private final PlugRepository plugRepository;
     private final RestTemplate restTemplate;
     private final String token = "ba4033b0-778d-4480-8c55-558bfa1a16dc";
 
@@ -59,6 +61,7 @@ public class ControlService {
         }
 
         boolean isSuccess = response.getStatusCode().is2xxSuccessful();
+        responseBody.put("plugName",plugRepository.findByPlugId(plugId).get().getPlugName());
         responseBody.put("status", isSuccess ? "success" : "error");
         responseBody.put("message", isSuccess ? "플러그 제어 성공" : "플러그 제어 실패");
         responseBody.put("statusCode", response.getStatusCodeValue());

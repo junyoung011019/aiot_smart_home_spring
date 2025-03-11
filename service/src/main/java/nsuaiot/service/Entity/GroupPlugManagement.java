@@ -16,6 +16,8 @@ public class GroupPlugManagement {
     private Integer no;
     private Long groupId;
     private String plugId;
+
+    @Setter
     private String action;
 
     public GroupPlugManagement(){}

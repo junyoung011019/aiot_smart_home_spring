@@ -1,0 +1,22 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: 7fd6112fa7ebf21d960c2f2a64f6d690
+            client-secret: u9okpAxCFPjqkiAUWWUCCrhc4ED2uxMH
+            redirect-uri: "http://localhost:8080/kakao/callback"
+            authorization-grant-type: authorization_code
+            scope: profile_nickname, profile_image, account_email
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+
+
+jwt:
+  secret:
+    access: "myPasswordToLongIWantToFinishMyFinalProjectWhatIsProblemInMyJwtToken"
+    refresh: "myRefreshTokenIsEnoughLongRefreshTokenWhatIsProblem"

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>카카오 로그인</title>
+    <script>
+        async function getKakaoLoginUrl() {
+            const response = await fetch('/kakao/login-url'); // 서버에서 로그인 URL 가져오기
+            const kakaoAuthUrl = await response.text();
+            window.location.href = kakaoAuthUrl; // 카카오 로그인 페이지로 이동
+        }
+    </script>
+</head>
+<body>
+<h2>카카오 로그인</h2>
+<button onclick="getKakaoLoginUrl()">
+    <img src="/kakaoLogin.png" alt="카카오 로그인 버튼">
+</button>
+</body>
+</html>

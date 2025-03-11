@@ -11,9 +11,11 @@ public class Plug {
     public Integer no;
     public String owner;
 
+    @Getter
     @Column(name = "plug_id")
     public String plugId;
 
+    @Getter
     @Column(name = "plug_name")
     public String plugName;
 
