@@ -39,7 +39,7 @@ def get_plug_data():
     #MySQL에서 plug_id와 관련 정보를 가져오기
     with pymysql.connect(**MYSQL_CONFIG) as connection:
         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute("SELECT plug_id, owner, plug_name, actual_device FROM plug")
+            cursor.execute("SELECT plug_id, plug_name, actual_device FROM plug")
             return cursor.fetchall()
 
 def save_to_mongo(data):

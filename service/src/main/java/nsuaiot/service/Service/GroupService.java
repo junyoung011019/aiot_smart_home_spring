@@ -1,18 +1,14 @@
 package nsuaiot.service.Service;
 
 import lombok.RequiredArgsConstructor;
+import nsuaiot.service.DTO.ApiResponse;
 import nsuaiot.service.Entity.GroupList;
 import nsuaiot.service.Entity.GroupPlugManagement;
-import nsuaiot.service.Entity.Plug;
 import nsuaiot.service.Repository.GroupListRepository;
 import nsuaiot.service.Repository.GroupPlugManagementRepository;
-import nsuaiot.service.Repository.PlugRepository;
-import org.json.JSONArray;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -22,42 +18,52 @@ public class GroupService {
 
     private final GroupListRepository groupListRepository;
     private final GroupPlugManagementRepository groupPlugManagementRepository;
-    private final PlugRepository plugRepository;
 
-    public ResponseEntity<?> groupCheck(){
-        List<GroupList> groupList = groupListRepository.findAll(Sort.by("creationTime"));
+    //그룹 목록 조회
+    public ResponseEntity<?> groupCheck(String userId){
+        Optional<List<GroupList>> groupList = groupListRepository.findByOwnerId(userId);
         if(groupList.isEmpty()){
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(204).body(new ApiResponse("그룹 리스트가 없습니다."));
         }
         return ResponseEntity.ok().body(groupList);
     }
 
-    public ResponseEntity<String> groupCreate(String groupName){
-        if(groupListRepository.existsByGroupName(groupName)){
-            return ResponseEntity.status(400).body("이미 있는 그룹명입니다.");
+    //그룹 생성
+    public ResponseEntity<?> groupCreate(String groupName, String userId){
+        //해당 유저에 그룹명이 존재하는지 확인
+        if(groupListRepository.existsByOwnerIdAndGroupName(userId, groupName)){
+            return ResponseEntity.status(409).body(new ApiResponse("이미 존재하는 그룹명입니다."));
         }
-        GroupList group = new GroupList(groupName);
+
+        //그룹의 아이디가 중복이라면 다시 랜덤값 부여
         Long generatedId;
         do{
             generatedId=ThreadLocalRandom.current().nextLong(100000L, 199999L);;
         }while(groupListRepository.existsById(generatedId));
-        group.setGroupId(generatedId);
-
+        
+        //생성자로 그룹 객체(그룹명, 주인, 그룹 ID)생성 및 저장 
+        GroupList group = new GroupList(userId, groupName,generatedId);
         groupListRepository.save(group);
-        return ResponseEntity.ok().body("그룹 생성 완료");
+        
+        return ResponseEntity.ok().body(new ApiResponse("그룹 생성 완료"));
     }
 
-    public ResponseEntity<String> groupRemove(String groupId){
-        if(!groupListRepository.existsById(Long.valueOf(groupId))){
-            return ResponseEntity.status(404).body("그룹이 존재하지 않습니다.");
+    //그룹 삭제
+    public ResponseEntity<?> groupRemove(Long groupId, String userId){
+        //그룹 있는지 여부 검사
+        Optional<GroupList> deleteGroup = groupListRepository.findByGroupIdAndOwnerId(groupId,userId);
+        if(deleteGroup.isEmpty()){
+            return ResponseEntity.status(404).body(new ApiResponse("그룹이 존재하지 않습니다."));
         }
-        List<GroupPlugManagement> deletePlugs = groupPlugManagementRepository.findByGroupId(Long.valueOf(groupId));
+        
+        //그룹 내 액션 제거
+        Optional <List<GroupPlugManagement>> deletePlugs = groupPlugManagementRepository.findByGroupId(groupId);
         try {
-            groupPlugManagementRepository.deleteAll(deletePlugs);
-            groupListRepository.deleteById(Long.valueOf(groupId));
-            return ResponseEntity.ok().body("그룹 삭제 완료");
+            groupPlugManagementRepository.deleteAll(deletePlugs.get());
+            groupListRepository.deleteById(groupId);
+            return ResponseEntity.ok().body(new ApiResponse("그룹 삭제 완료"));
         }catch (Exception e){
-            return ResponseEntity.status(500).body("서버 오류");
+            return ResponseEntity.status(500).body(new ApiResponse("서버 오류"));
         }
 
     }

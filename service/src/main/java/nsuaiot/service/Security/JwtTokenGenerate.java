@@ -14,6 +14,7 @@ import java.util.Date;
 @Component
 public class JwtTokenGenerate {
 
+    // (액세스/리프레시) 암호키 주입
     @Value("${jwt.secret.access}")
     private String ACCESS_KEY;
     private SecretKey accessKey;
@@ -28,10 +29,12 @@ public class JwtTokenGenerate {
         this.refreshKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(REFRESH_KEY));
     }
 
+    // (액세스/리프레시) 키 생성
     public String generateAccessToken(String userId){
         return Jwts.builder()
                 .setSubject(userId)
                 .setIssuedAt(new Date())
+                //1시간
                 .setExpiration(new Date(System.currentTimeMillis()+1000*60*60))
                 .signWith(accessKey, Jwts.SIG.HS256)
                 .compact();
@@ -41,16 +44,18 @@ public class JwtTokenGenerate {
         return Jwts.builder()
                 .setSubject(userId)
                 .setIssuedAt(new Date())
+                //7일
                 .setExpiration(new Date(System.currentTimeMillis()+1000*60*60*24*7))
                 .signWith(refreshKey, Jwts.SIG.HS256)
                 .compact();
     }
 
+    //생성된 (액세스/리프레시) 키 리턴
     public SecretKey getAccessKey(){
         return accessKey;
     }
-
     public SecretKey getRefreshKey(){
         return refreshKey;
     }
+    
 }

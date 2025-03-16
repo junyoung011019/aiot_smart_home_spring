@@ -6,6 +6,7 @@ spring:
           kakao:
             client-id: 7fd6112fa7ebf21d960c2f2a64f6d690
             client-secret: u9okpAxCFPjqkiAUWWUCCrhc4ED2uxMH
+            javascript-key: "026dc65bf545cec292b6ff02dac60287"
             redirect-uri: "http://localhost:8080/kakao/callback"
             authorization-grant-type: authorization_code
             scope: profile_nickname, profile_image, account_email
@@ -20,3 +21,6 @@ jwt:
   secret:
     access: "myPasswordToLongIWantToFinishMyFinalProjectWhatIsProblemInMyJwtToken"
     refresh: "myRefreshTokenIsEnoughLongRefreshTokenWhatIsProblem"
+
+heyhome:
+  token: "ba4033b0-778d-4480-8c55-558bfa1a16dc"

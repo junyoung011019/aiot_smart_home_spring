@@ -2,14 +2,15 @@ package nsuaiot.service.Entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 @Table(name = "plug")
 public class Plug {
     @Id
     public Integer no;
-    public String owner;
+
+    @Getter
+    public String ownerId;
 
     @Getter
     @Column(name = "plug_id")
@@ -21,4 +22,5 @@ public class Plug {
 
     @Column(name = "actual_device")
     public String actualDevice;
+
 }

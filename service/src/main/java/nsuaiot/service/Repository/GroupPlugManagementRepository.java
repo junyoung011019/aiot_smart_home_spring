@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface GroupPlugManagementRepository extends JpaRepository<GroupPlugManagement, Long> {
     Optional<GroupPlugManagement> findByGroupIdAndPlugId(Long groupId, String plugId);
 
-    List<GroupPlugManagement> findByGroupId(Long groupId);
+    Optional <List<GroupPlugManagement>> findByGroupId(Long groupId);
 }
 
 

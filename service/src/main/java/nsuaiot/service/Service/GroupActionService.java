@@ -1,6 +1,7 @@
 package nsuaiot.service.Service;
 
 import lombok.RequiredArgsConstructor;
+import nsuaiot.service.DTO.ApiResponse;
 import nsuaiot.service.Entity.GroupList;
 import nsuaiot.service.Entity.GroupPlugManagement;
 import nsuaiot.service.Entity.Plug;
@@ -8,17 +9,13 @@ import nsuaiot.service.Repository.GroupListRepository;
 import nsuaiot.service.Repository.GroupPlugManagementRepository;
 import nsuaiot.service.Repository.PlugRepository;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +25,7 @@ public class GroupActionService {
     private final String token = "ba4033b0-778d-4480-8c55-558bfa1a16dc";
 
     //API 호출 함수
-    public ResponseEntity<String> postPlugControl(String plugId, String requestBody) {
+    public ResponseEntity<?> postPlugControl(String plugId, String requestBody) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -38,16 +35,11 @@ public class GroupActionService {
 
         try {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            System.out.println("Response Code: " + response.getStatusCode());
-            System.out.println("Response Body: " + response.getBody());
             return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
         } catch (HttpClientErrorException e) {
-            System.out.println(e.getStatusCode());
-            System.out.println(e.getResponseBodyAsString());
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
         } catch (Exception e) {
-            System.out.println("뭔가 에러 2");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("API 요청 중 오류 발생");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("API 요청 중 오류 발생"));
         }
     }
 
@@ -55,132 +47,152 @@ public class GroupActionService {
     private final GroupPlugManagementRepository groupPlugManagementRepository;
     private final PlugRepository plugRepository;
 
-    public ResponseEntity<String> editAction(Long groupId, List<Map<String, String>> devices){
-        if(!groupListRepository.existsById(groupId)){
-            return ResponseEntity.status(404).body("그룹 id값이 올바르지 않습니다.");
+    //그룹 액션 추가/수정/삭제
+    public ResponseEntity<?> editAction(Long groupId, List<Map<String, String>> updateDataSet, String userId){
+        //그룹 존재 여부 확인
+        Optional<GroupList> editGroup = groupListRepository.findByGroupIdAndOwnerId(groupId,userId);
+        if(editGroup.isEmpty()){
+            return ResponseEntity.status(404).body(new ApiResponse("그룹 id값이 올바르지 않습니다."));
         }
 
-        List<GroupPlugManagement> saveList = groupPlugManagementRepository.findByGroupId(groupId);
-        for(Map<String, String> device : devices){
-            String plugId = device.get("plugId");
-            String plugControl = device.get("action");
+        //존재 데이터 해쉬맵으로 변환
+        Optional<List<GroupPlugManagement>> saveList = groupPlugManagementRepository.findByGroupId(groupId);
+        Map<String, GroupPlugManagement> existingMap = new HashMap<>();
+        for (GroupPlugManagement item : saveList.get()) {
+            existingMap.put(item.getPlugId(), item);
+        }
 
-            if(!plugRepository.findByPlugId(plugId).isPresent()){
-                return ResponseEntity.status(404).body("플러그 "+plugId+"가 존재하지 않습니다!");
+        //사용한 플러그 아이디 저장
+        Set<String> savePlugId = new HashSet<>();
+
+        //갱신 데이터 저장
+        List<GroupPlugManagement> updatedList = new ArrayList<>();
+        for (Map<String, String> updataData : updateDataSet) {
+            String plugId = updataData.get("plugId");
+            savePlugId.add(plugId);
+            String plugControl = updataData.get("action");
+
+            //플러그 존재 여부 확인
+            if (!plugRepository.existsByPlugId(plugId)) {
+                return ResponseEntity.status(404).body(new ApiResponse("플러그 " + plugId + "가 존재하지 않습니다!"));
             }
-
-            int change=0;
-            for(int i =0; i<saveList.size();i++){
-                if(saveList.get(i).getPlugId().equals(plugId)) {
-                    saveList.get(i).setAction(plugControl);
-                    change += 1;
-                }
-            }
-
-            if(change==0){
-                GroupPlugManagement newAction=new GroupPlugManagement(groupId, plugId, plugControl);
-                groupPlugManagementRepository.save(newAction);
+            
+            //플러그에 대한 액션 값있으면 액션값 덮어쓰기
+            if (existingMap.containsKey(plugId)) {
+                existingMap.get(plugId).setAction(plugControl);
+            } else {
+                updatedList.add(new GroupPlugManagement(groupId, plugId, plugControl));
             }
         }
-        return ResponseEntity.ok().body("해당 그룹에 액션이 추가 / 수정이 완료되었습니다.");
+
+        //삭제 데이터 판별
+        List<GroupPlugManagement> deleteList = new ArrayList<>();
+        for (GroupPlugManagement item : saveList.get()) {
+            if (!savePlugId.contains(item.getPlugId())) {
+                deleteList.add(item);
+            }
+        }
+
+        //기존 데이터 저장
+        groupPlugManagementRepository.saveAll(new ArrayList<>(existingMap.values()));
+        //새로운 데이터 저장
+        groupPlugManagementRepository.saveAll(updatedList);
+        //사라진 데이터 삭제
+        if (!deleteList.isEmpty()) {
+            groupPlugManagementRepository.deleteAll(deleteList);
+        }
+
+        return ResponseEntity.ok().body(new ApiResponse("해당 그룹에 액션이 추가 / 수정이 완료되었습니다."));
     }
 
 
+    //그룹 액션 조회
+    public ResponseEntity<?> checkAction(Long groupId, String userId){
 
-    public ResponseEntity<String> checkAction(Long groupId){
-
-        List<GroupPlugManagement> groupData = groupPlugManagementRepository.findByGroupId(groupId);
-        Optional<GroupList> group = groupListRepository.findById(groupId);
-
-        if(group.isEmpty()){
-            return ResponseEntity.status(404).body("그룹이 존재하지 않습니다!");
+        //그룹 존재 여부 확인
+        Optional<GroupList> groupList = groupListRepository.findByGroupIdAndOwnerId(groupId,userId);
+        if(groupList.isEmpty()){
+            return ResponseEntity.status(404).body(new ApiResponse("그룹이 존재하지 않습니다!"));
         }
 
+        //그룹 액션 데이터 조회
+        Optional<List<GroupPlugManagement>> groupData = groupPlugManagementRepository.findByGroupId(groupId);
         if(groupData.isEmpty()){
-            return ResponseEntity.status(204).body(" ");
+            return ResponseEntity.status(204).body(new ApiResponse("그룹에 조회된 액션이 없습니다."));
         }
 
+        //그룹 명과 그룹 아이디 선 저장
         JSONArray groupDataArray = new JSONArray();
         JSONObject groupObject = new JSONObject()
-                .put("groupName", group.get().getGroupName())
-                .put("groupId", group.get().getGroupId());
+                .put("groupName", groupList.get().getGroupName())
+                .put("groupId", groupList.get().getGroupId());
+        groupDataArray.put(groupObject);
 
+        //그룹에 있는 그룹 액션 plugAction 배열에 저장
         JSONArray plugArray = new JSONArray();
-        for (GroupPlugManagement groupAction : groupData) {
+        for (GroupPlugManagement groupAction : groupData.get()) {
             String plugId= groupAction.getPlugId();
-            Optional<Plug> plugData=plugRepository.findByPlugId(plugId);
+            Optional<Plug> plugData=plugRepository.findByPlugIdAndOwnerId(plugId,userId);
             JSONObject plugAction = new JSONObject()
                     .put("plugName",plugData.get().plugName)
                     .put("plugId", plugId)
                     .put("plugControl", groupAction.getAction());
             plugArray.put(plugAction);
         }
-        groupDataArray.put(groupObject);
+        //plugArray 그룹 액션 리스트에 저장
         groupObject.put("plug", plugArray);
 
         return ResponseEntity.ok().body(groupDataArray.toString());
     }
 
-    public ResponseEntity<String> runAction(Long groupId){
-        if(!groupListRepository.existsById(groupId)){
-            return ResponseEntity.status(404).body("그룹이 존재하지 않습니다!");
+    //그룹 액션 실행
+    public ResponseEntity<?> runAction(Long groupId, String userId){
+        
+        //그룹 존재 여부 확인
+        if(groupListRepository.findByGroupIdAndOwnerId(groupId,userId).isEmpty()){
+            return ResponseEntity.status(404).body(new ApiResponse("그룹이 존재하지 않습니다!"));
         }
 
-        List<GroupPlugManagement> groupPlugManagements = groupPlugManagementRepository.findByGroupId(groupId);
+        //그룹에 선언된 동작이 없을 경우
+        Optional<List<GroupPlugManagement>> groupPlugManagements = groupPlugManagementRepository.findByGroupId(groupId);
         if(groupPlugManagements.isEmpty()){
-            return ResponseEntity.status(204).body(" ");
+            return ResponseEntity.status(204).body(new ApiResponse("실행할 동작이 존재하지 않습니다!"));
         }
-        System.out.println(groupPlugManagements);
-
-        String url = "https://goqual.io/openapi/control/";
-        String requestBody;
-        int successCount=0;
+        
+        // (성공/실패) 기기명 저장
         JSONArray successArray = new JSONArray();
-        int errorCount=0;
         JSONArray errorArray = new JSONArray();
 
         try{
-            for(int i=0; i<groupPlugManagements.size();i++){
-                GroupPlugManagement action = groupPlugManagements.get(i);
-                System.out.println("action = " + action);
+            for(int i=0; i<groupPlugManagements.get().size();i++){
+                GroupPlugManagement action = groupPlugManagements.get().get(i);
 
-                if(action.getAction().equals("on")){
-                    requestBody="{\n" +
-                            "    \"requirments\": {\n" +
-                            "        \"power\": true\n" +
-                            "    }\n" +
-                            "}";
-                }else if(action.getAction().equals("off")){
-                    requestBody="\"{\\n\" +\n" +
-                            "                    \"    \\\"requirments\\\": {\\n\" +\n" +
-                            "                    \"        \\\"power\\\": false\\n\" +\n" +
-                            "                    \"    }\\n\" +\n" +
-                            "                    \"}\"";
-                }else {
-                    return ResponseEntity.status(400).body("잘못된 요청입니다.");
-                }
+                //헤이홈 서버로 API 요청
+                String power = String.valueOf("on".equals(action));
+                JSONObject requestBody = new JSONObject().put("requirments",new JSONObject().put("power",power));
+                ResponseEntity<?> response = postPlugControl(action.getPlugId(), requestBody.toString());
 
-                ResponseEntity<String> postResult = postPlugControl(action.getPlugId(),requestBody);
-                if(postResult.getStatusCode().is2xxSuccessful()){
+                //응답코드로 (성공/실패) 여부 확인 후 배열에 저장
+                if(response.getStatusCode().is2xxSuccessful()){
                     String controlPlugId = action.getPlugId();
-                    String controlPlugName = plugRepository.findByPlugId(controlPlugId).get().plugName;
+                    String controlPlugName = plugRepository.findByPlugIdAndOwnerId(controlPlugId, userId).get().plugName;
                     successArray.put(controlPlugName);
-                    successCount+=1;
                 }else {
                     String controlPlugId = action.getPlugId();
-                    String controlPlugName = plugRepository.findByPlugId(controlPlugId).get().plugName;
+                    String controlPlugName = plugRepository.findByPlugIdAndOwnerId(controlPlugId, userId).get().plugName;
                     errorArray.put(controlPlugName);
-                    errorCount+=1;
                 }
             }
+            
+            //응답 메세지 정리 (성공 횟수, 성공 리스트, 실패 횟수, 실패 리스트 반환)
             JSONObject returnData = new JSONObject();
-            returnData.put("successCount",successCount)
+            returnData.put("successCount",successArray.length())
                     .put("successArray",successArray)
-                    .put("errorCount",errorCount)
+                    .put("errorCount",errorArray.length())
                     .put("errorArray",errorArray);
             return ResponseEntity.ok().body(returnData.toString());
         }catch (Exception e){
-            return ResponseEntity.status(500).body("서버 에러 발생");
+            return ResponseEntity.status(500).body(new ApiResponse("서버 에러 발생"));
         }
 
 
