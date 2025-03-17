@@ -17,6 +17,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.swing.text.html.Option;
+import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 
@@ -108,6 +109,8 @@ public class KakaoService {
         String accessToken = jwtTokenGenerate.generateAccessToken(userId);
         String refreshToken = jwtTokenGenerate.generateRefreshToken(userId);
 
-        return ResponseEntity.status(200).body(new UserTokenDTO(accessToken,refreshToken));
+        String bixbyRedirectUrl = "redirect:/bixby://capsule/smarthomecontrolusingbixby.LoginOAuth?accessToken="+accessToken+"&refreshToken="+refreshToken;
+
+        return ResponseEntity.status(302).location(URI.create(bixbyRedirectUrl)).build();
     }
 }
