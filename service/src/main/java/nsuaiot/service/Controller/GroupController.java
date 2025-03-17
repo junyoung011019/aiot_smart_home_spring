@@ -33,7 +33,7 @@ public class GroupController {
     //그룹 삭제
     @Transactional(readOnly = false)
     @DeleteMapping("/remove/{groupId}")
-    public ResponseEntity<?> groupRemove(@RequestParam Long groupId, @RequestAttribute("userId") String userId){
+    public ResponseEntity<?> groupRemove(@PathVariable Long groupId, @RequestAttribute("userId") String userId){
         return groupService.groupRemove(groupId, userId);
     }
 
