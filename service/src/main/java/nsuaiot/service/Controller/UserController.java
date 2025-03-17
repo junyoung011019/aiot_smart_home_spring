@@ -20,14 +20,14 @@ public class UserController {
     //아이디 중복 체크
     @Transactional(readOnly = true)
     @GetMapping("/userIdExists")
-    public ResponseEntity<String> userIdExists(@RequestParam String userId) {
+    public ResponseEntity<?> userIdExists(@RequestParam String userId) {
         return userService.userIdExists(userId);
     }
 
     //닉네임 중복 체크
     @Transactional(readOnly = true)
     @GetMapping("/nickNameExists")
-    public ResponseEntity<String> nicknameExists(@RequestParam String nickName) {
+    public ResponseEntity<?> nicknameExists(@RequestParam String nickName) {
         return userService.nickNameExists(nickName);
     }
 

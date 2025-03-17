@@ -27,7 +27,7 @@ public class KakaoController {
         String accessToken = kakaoService.getToken(code);
         //카카오 (액세스 토큰 -> 사용자 아이디 조회)
         String kakaoUserId = kakaoService.getUserInfo(accessToken);
-        return kakaoService.getUserByKakaoUserId(kakaoUserId);
+        return kakaoService.getRedirectURL(kakaoUserId);
     }
 
     //플러터용 콜백

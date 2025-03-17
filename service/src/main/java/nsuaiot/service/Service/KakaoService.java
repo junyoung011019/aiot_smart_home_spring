@@ -99,7 +99,27 @@ public class KakaoService {
     }
 
 
-    //카카오 ID -> DB 조회
+    //카카오 ID -> DB 조회 -> 리다이렉트 URL 전달 (빅스비 캡슐)
+    public ResponseEntity<?> getRedirectURL(String kakaoUserId) {
+        Optional<User> findUser = userRepository.findByKakaoId(kakaoUserId);
+        if (findUser.isEmpty()) {
+            return ResponseEntity.status(401).body(new ApiResponse("카카오 아이디 : " + kakaoUserId + " 등록된 회원이 없습니다."));
+        }
+        String userId = findUser.get().getUserId();
+        String accessToken = jwtTokenGenerate.generateAccessToken(userId);
+        String refreshToken = jwtTokenGenerate.generateRefreshToken(userId);
+
+        String vivAppUrl = String.format(
+                "viv-app://authentication/?intent=LoginOAuth&accessToken=%s&refreshToken=%s",
+                accessToken, refreshToken
+        );
+
+        return ResponseEntity.status(HttpStatus.FOUND) // 302 Redirect
+                .location(URI.create(vivAppUrl))
+                .build();
+    }
+
+    //카카오 ID -> DB 조회 -> 토큰 발행 (앱)
     public ResponseEntity<?> getUserByKakaoUserId(String kakaoUserId){
         Optional<User> findUser = userRepository.findByKakaoId(kakaoUserId);
         if(findUser.isEmpty()){
@@ -109,8 +129,6 @@ public class KakaoService {
         String accessToken = jwtTokenGenerate.generateAccessToken(userId);
         String refreshToken = jwtTokenGenerate.generateRefreshToken(userId);
 
-        String bixbyRedirectUrl = "redirect:/bixby://capsule/smarthomecontrolusingbixby.LoginOAuth?accessToken="+accessToken+"&refreshToken="+refreshToken;
-
-        return ResponseEntity.status(302).location(URI.create(bixbyRedirectUrl)).build();
+        return ResponseEntity.status(200).body(new UserTokenDTO(accessToken,refreshToken));
     }
 }

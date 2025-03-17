@@ -23,22 +23,22 @@ public class UserService {
     private final JwtTokenGenerate jwtTokenGenerate;
 
     //아이디 중복 체크
-    public ResponseEntity<String> userIdExists(String userId){
+    public ResponseEntity<?> userIdExists(String userId){
         Optional<User> findIdExists =userRepository.findByUserId(userId);
         if(!findIdExists.isPresent()){
-            return ResponseEntity.status(204).body("아이디 사용 가능합니다.");
+            return ResponseEntity.status(204).body(new ApiResponse("아이디 사용 가능합니다."));
         }else{
-            return ResponseEntity.status(409).body("이미 사용되는 아이디입니다.");
+            return ResponseEntity.status(409).body(new ApiResponse("이미 사용되는 아이디입니다."));
         }
     }
 
     //닉네임 중복 체크
-    public ResponseEntity<String> nickNameExists(String nickName){
+    public ResponseEntity<?> nickNameExists(String nickName){
         Optional<User> findNickNameExists =userRepository.findByNickName(nickName);
         if(!findNickNameExists.isPresent()){
-            return ResponseEntity.status(204).body("닉네임 사용 가능합니다.");
+            return ResponseEntity.status(204).body(new ApiResponse("닉네임 사용 가능합니다."));
         }else{
-            return ResponseEntity.status(409).body("이미 사용되는 닉네임입니다.");
+            return ResponseEntity.status(409).body(new ApiResponse("이미 사용되는 닉네임입니다."));
         }
     }
 
