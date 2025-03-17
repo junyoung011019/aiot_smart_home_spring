@@ -10,6 +10,7 @@ import nsuaiot.service.Repository.GroupPlugManagementRepository;
 import nsuaiot.service.Repository.PlugRepository;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -22,12 +23,14 @@ import java.util.*;
 public class GroupActionService {
 
     private final RestTemplate restTemplate;
-    private final String token = "ba4033b0-778d-4480-8c55-558bfa1a16dc";
+
+    @Value("${heyhome.token}")
+    private String HEYHOME_TOKEN;
 
     //API 호출 함수
     public ResponseEntity<?> postPlugControl(String plugId, String requestBody) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
+        headers.set("Authorization", "Bearer " + HEYHOME_TOKEN);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         String url = "https://goqual.io/openapi/control/" + plugId;
@@ -168,18 +171,18 @@ public class GroupActionService {
                 GroupPlugManagement action = groupPlugManagements.get().get(i);
 
                 //헤이홈 서버로 API 요청
-                String power = String.valueOf("on".equals(action));
+                String power = String.valueOf("on".equals(action.getAction()));
                 JSONObject requestBody = new JSONObject().put("requirments",new JSONObject().put("power",power));
                 ResponseEntity<?> response = postPlugControl(action.getPlugId(), requestBody.toString());
 
                 //응답코드로 (성공/실패) 여부 확인 후 배열에 저장
                 if(response.getStatusCode().is2xxSuccessful()){
                     String controlPlugId = action.getPlugId();
-                    String controlPlugName = plugRepository.findByPlugIdAndOwnerId(controlPlugId, userId).get().plugName;
+                    String controlPlugName = plugRepository.findByPlugIdAndOwnerId(controlPlugId, userId).get().getPlugName();
                     successArray.put(controlPlugName);
                 }else {
                     String controlPlugId = action.getPlugId();
-                    String controlPlugName = plugRepository.findByPlugIdAndOwnerId(controlPlugId, userId).get().plugName;
+                    String controlPlugName = plugRepository.findByPlugIdAndOwnerId(controlPlugId, userId).get().getPlugName();
                     errorArray.put(controlPlugName);
                 }
             }
