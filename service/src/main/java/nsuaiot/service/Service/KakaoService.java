@@ -11,6 +11,7 @@ import nsuaiot.service.Repository.UserRepository;
 import nsuaiot.service.Security.JwtTokenGenerate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -27,6 +28,7 @@ public class KakaoService {
 
     private final UserRepository userRepository;
     private final JwtTokenGenerate jwtTokenGenerate;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}") // 환경 변수에서 API 키 로드
     private String kakaoClientId;
@@ -109,6 +111,11 @@ public class KakaoService {
         String accessToken = jwtTokenGenerate.generateAccessToken(userId);
         String refreshToken = jwtTokenGenerate.generateRefreshToken(userId);
 
+        //리프레시 토큰 해싱 후 DB 저장
+        String hashedRefreshToken = passwordEncoder.encode(refreshToken);
+        findUser.get().setRefreshToken(hashedRefreshToken);
+        userRepository.save(findUser.get());
+
         String vivAppUrl = String.format(
                 "viv-app://authentication/?intent=LoginOAuth&accessToken=%s&refreshToken=%s",
                 accessToken, refreshToken
@@ -128,6 +135,11 @@ public class KakaoService {
         String userId = findUser.get().getUserId();
         String accessToken = jwtTokenGenerate.generateAccessToken(userId);
         String refreshToken = jwtTokenGenerate.generateRefreshToken(userId);
+
+        //리프레시 토큰 해싱 후 DB 저장
+        String hashedRefreshToken = passwordEncoder.encode(refreshToken);
+        findUser.get().setRefreshToken(hashedRefreshToken);
+        userRepository.save(findUser.get());
 
         return ResponseEntity.status(200).body(new UserTokenDTO(accessToken,refreshToken));
     }

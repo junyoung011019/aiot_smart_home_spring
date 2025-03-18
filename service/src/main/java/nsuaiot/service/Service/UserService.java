@@ -78,6 +78,11 @@ public class UserService {
             String accessToken = jwtTokenGenerate.generateAccessToken(userId);
             String refreshToken = jwtTokenGenerate.generateRefreshToken(userId);
 
+            //리프레시 토큰 해싱해서 저장
+            String hashedResfreshToken = passwordEncoder.encode(refreshToken);
+            findUser.get().setRefreshToken(hashedResfreshToken);
+            userRepository.save(findUser.get());
+
             return ResponseEntity.status(200).body(new UserTokenDTO(accessToken,refreshToken));
         }else{
             return ResponseEntity.status(401).body(new ApiResponse("아이디 혹은 비밀번호가 옳지 않습니다"));

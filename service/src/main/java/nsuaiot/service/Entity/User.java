@@ -27,4 +27,6 @@ public class User {
     private String nickName;
 
     private String kakaoId;
+
+    private String refreshToken;
 }

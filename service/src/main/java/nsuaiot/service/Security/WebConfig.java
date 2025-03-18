@@ -28,7 +28,12 @@ public class WebConfig implements WebMvcConfigurer {
 
                 //BixbyController
                 "/bixby/login",
-                "/bixby/login/kakao"
+                "/bixby/login/kakao",
+
+                //TokenController
+                "/token/refresh",
+
+                "/error"
         );
     }
 

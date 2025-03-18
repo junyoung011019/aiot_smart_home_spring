@@ -19,7 +19,7 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
     private static final List<String> EXCLUDED_PATHS = List.of(
             "/user/register", "/user/login", "/user/userIdExists", "/user/nickNameExists",
             "/kakao/callback", "/kakao/flutter",
-            "/bixby/login", "/bixby/login/kakao"
+            "/bixby/login", "/bixby/login/kakao", "/token/refresh", "error"
     );
 
     //토큰 값만 필터링
@@ -32,23 +32,31 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String token = getToken(request);
+
+        //요청에 토큰이 없을때
         if (token == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Unauthorized: Missing Token");
             return false;
         }
 
-        if (EXCLUDED_PATHS.contains(request.getRequestURI())) {
+        String requestURI = request.getServletPath();
+        System.out.println("요청 주소 : "+ requestURI);
+        //예외 주소일때
+        if (EXCLUDED_PATHS.contains(requestURI)) {
             return true;
         }
 
         SecretKey key = jwtTokenGenerate.getAccessKey();
+
+        //키 오류 일때
         if (key == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Unauthorized: Key Not Found");
             return false;
         }
 
+        //키 인증
         try {
             Claims claims = Jwts.parser()
                     .verifyWith(key)
@@ -59,10 +67,14 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
             String userId = claims.getSubject();
             request.setAttribute("userId", userId);
             return true;
+
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Unauthorized: Invalid Token");
+            response.getWriter().write("Unauthorized: Invalid Token - 요청에 대한 토큰이 인가되지 않았습니다.");
             return false;
         }
     }
+
+
+
 }

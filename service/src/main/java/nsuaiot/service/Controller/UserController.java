@@ -39,7 +39,7 @@ public class UserController {
     }
     
     //로그인
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginDTO userLoginDTO) {
         return userService.login(userLoginDTO);

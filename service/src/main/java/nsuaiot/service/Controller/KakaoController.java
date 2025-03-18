@@ -21,6 +21,7 @@ public class KakaoController {
     private final KakaoService kakaoService;
 
     //카카오 인가코드 -> 사용자 조회(DB 조회) -> 토큰 발급
+    @Transactional(readOnly = false)
     @GetMapping("/callback")
     public ResponseEntity<?> kakaoCallback(@RequestParam String code) throws JsonProcessingException {
         //카카오 (인가코드 -> 액세스 토큰)
@@ -31,10 +32,12 @@ public class KakaoController {
     }
 
     //플러터용 콜백
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     @GetMapping("/flutter")
     public ResponseEntity<?> flutterCallback(@RequestParam String accessToken) throws JsonProcessingException {
+        System.out.println("사용자의 accessToken = " + accessToken);
         String kakaoUserId = kakaoService.getUserInfo(accessToken);
+        System.out.println("사용자의 kakaoUserId = " + kakaoUserId);
         return kakaoService.getUserByKakaoUserId(kakaoUserId);
     }
 
