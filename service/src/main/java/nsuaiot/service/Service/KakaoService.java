@@ -141,6 +141,6 @@ public class KakaoService {
         findUser.get().setRefreshToken(hashedRefreshToken);
         userRepository.save(findUser.get());
 
-        return ResponseEntity.status(200).body(new UserTokenDTO(accessToken,refreshToken));
+        return ResponseEntity.status(200).body(new UserTokenDTO(accessToken,refreshToken,findUser.get().getNickName()));
     }
 }

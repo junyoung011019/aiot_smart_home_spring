@@ -19,7 +19,7 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
     private static final List<String> EXCLUDED_PATHS = List.of(
             "/user/register", "/user/login", "/user/userIdExists", "/user/nickNameExists",
             "/kakao/callback", "/kakao/flutter",
-            "/bixby/login", "/bixby/login/kakao", "/token/refresh", "error"
+            "/bixby/login", "/bixby/login/kakao", "/token/refresh", "error", "/token/bixby/refresh"
     );
 
     //토큰 값만 필터링

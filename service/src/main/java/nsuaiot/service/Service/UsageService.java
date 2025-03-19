@@ -70,12 +70,10 @@ public class UsageService {
         String url = "https://goqual.io/openapi/devices/plug/"+plugId+"/history?startDate="+startDate+"&endDate="+endDate;
         String response = getApiCall(url);
 
-        //응답 메세지 포맷팅
-        List<UsageRequest> usageList = usageDataFormatting(response);
-        if(usageList.isEmpty()){
+        if(response.isEmpty()){
             return ResponseEntity.status(204).body(new ApiResponse("플러그의 사용량이 없습니다"));
         }
-        return ResponseEntity.ok(usageList.toString());
+        return ResponseEntity.ok(response);
     }
 
 

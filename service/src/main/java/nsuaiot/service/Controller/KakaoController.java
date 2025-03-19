@@ -35,9 +35,7 @@ public class KakaoController {
     @Transactional(readOnly = false)
     @GetMapping("/flutter")
     public ResponseEntity<?> flutterCallback(@RequestParam String accessToken) throws JsonProcessingException {
-        System.out.println("사용자의 accessToken = " + accessToken);
         String kakaoUserId = kakaoService.getUserInfo(accessToken);
-        System.out.println("사용자의 kakaoUserId = " + kakaoUserId);
         return kakaoService.getUserByKakaoUserId(kakaoUserId);
     }
 

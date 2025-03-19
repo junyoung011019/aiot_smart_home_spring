@@ -52,7 +52,7 @@ public class UserService {
         if(!(registerUserId.matches("^[a-zA-Z0-9]{5,10}$"))){
             return ResponseEntity.status(400).body(new ApiResponse("아이디는 5자리 이상, 10자리 이하여야합니다."));
         }
-        if(!(registerUserPW.matches("^[a-zA-Z0-9]{8,20}$"))){
+        if(!(registerUserPW.matches("^[a-zA-Z0-9!@#$%^&*()_+\\-={}\\[\\]:;\"'<>,.?/]{8,20}$"))){
             return ResponseEntity.status(400).body(new ApiResponse("비밀번호는 8자리 이상, 20자리 이하여야합니다."));
         }
         if(userRepository.findByUserIdOrNickName(registerUserId, registerNickNameName).isPresent()){
@@ -83,7 +83,7 @@ public class UserService {
             findUser.get().setRefreshToken(hashedResfreshToken);
             userRepository.save(findUser.get());
 
-            return ResponseEntity.status(200).body(new UserTokenDTO(accessToken,refreshToken));
+            return ResponseEntity.status(200).body(new UserTokenDTO(accessToken,refreshToken,findUser.get().getNickName()));
         }else{
             return ResponseEntity.status(401).body(new ApiResponse("아이디 혹은 비밀번호가 옳지 않습니다"));
         }
