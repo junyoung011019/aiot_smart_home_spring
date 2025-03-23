@@ -1,5 +1,6 @@
 package nsuaiot.service;
 
+import com.google.firebase.FirebaseApp;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
