@@ -34,6 +34,9 @@ public class WebConfig implements WebMvcConfigurer {
                 "/token/refresh",
                 "/token/bixby/refresh",
 
+                //AppController
+                "/app/push",
+
                 "/error"
         );
     }
