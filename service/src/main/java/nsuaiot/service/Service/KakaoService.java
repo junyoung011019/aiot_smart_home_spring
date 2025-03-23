@@ -117,7 +117,8 @@ public class KakaoService {
         userRepository.save(findUser.get());
 
         String vivAppUrl = String.format(
-                "viv-app://authentication/?intent=LoginOAuth&accessToken=%s&refreshToken=%s",
+                "viv-app://run?capsuleId=smarthomecontrolusingbixby.kim&goal=LoginOAuth&accessToken=%s&refreshToken=%s",
+                //"viv-app://authentication/?intent=LoginOAuth&accessToken=%s&refreshToken=%s",
                 accessToken, refreshToken
         );
 

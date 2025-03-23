@@ -35,6 +35,16 @@ public class BixbyController {
         return "redirect:" + kakaoAuthUrl;
     }
 
+    @GetMapping("/legal/terms")
+    public String legalTerms(){
+        return "terms";
+    }
+
+    @GetMapping("/legal/privacy")
+    public String legalPrivacy(){
+        return "privacy";
+    }
+
 
 
 }
