@@ -29,4 +29,6 @@ public class User {
     private String kakaoId;
 
     private String refreshToken;
+
+    private String fcmKey;
 }
