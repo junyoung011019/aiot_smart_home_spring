@@ -81,6 +81,9 @@ public class UserService {
             //리프레시 토큰 해싱해서 저장
             String hashedResfreshToken = passwordEncoder.encode(refreshToken);
             findUser.get().setRefreshToken(hashedResfreshToken);
+            if(userLoginDTO.getFcmKey()!=null){
+                findUser.get().setFcmKey(userLoginDTO.getFcmKey());
+            }
             userRepository.save(findUser.get());
 
             return ResponseEntity.status(200).body(new UserTokenDTO(accessToken,refreshToken,findUser.get().getNickName()));

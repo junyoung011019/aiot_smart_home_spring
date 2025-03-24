@@ -8,4 +8,5 @@ import lombok.Setter;
 public class UserLoginDTO {
     private String userId;
     private String userPassword;
+    private String fcmKey;
 }
