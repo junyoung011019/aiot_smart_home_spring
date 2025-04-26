@@ -26,23 +26,4 @@ public class TokenController {
                 return refreshTokenService.validateRefreshToken(refreshToken);
         }
 
-        //리프레시 토큰을 통한 액세스 토큰 (빅스비 캡슐)
-        @Transactional(readOnly = true)
-        @PostMapping("/bixby/refresh")
-        public ResponseEntity<?> bixbyRefreshToken(@RequestBody RefreshTokenRequest refreshToken) throws IOException {
-                ResponseEntity<?> data = refreshTokenService.validateRefreshToken(refreshToken);
-                if(data.getStatusCode().equals(200)){
-                        String newAccessToken = data.toString();
-                        String vivAppUrl = String.format(
-                                "viv-app://authentication/?intent=LoginOAuth&accessToken=%s&newRefreshToken=%s",
-                                newAccessToken
-                        );
-                        return ResponseEntity.status(HttpStatus.FOUND) // 302 Redirect
-                                .location(URI.create(vivAppUrl))
-                                .build();
-                }else{
-                        return data;
-                }
-        }
-
 }

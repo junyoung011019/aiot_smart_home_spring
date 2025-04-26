@@ -16,6 +16,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(jwtAuthInterceptor)
                 .addPathPatterns("/**")
         .excludePathPatterns(
+
                 //UserController
                 "/user/register",
                 "/user/login",
@@ -23,19 +24,15 @@ public class WebConfig implements WebMvcConfigurer {
                 "/user/nickNameExists",
 
                 //KakaoController
-                "/kakao/callback",
-                "/kakao/flutter",
+                "/kakao/login",
 
-                //BixbyController
-                "/bixby/login",
-                "/bixby/login/kakao",
+                //LegalController
+                "/legal/terms",
+                "/legal/privacy",
 
                 //TokenController
                 "/token/refresh",
                 "/token/bixby/refresh",
-
-                //AppController
-                "/app/push",
 
                 "/error"
         );

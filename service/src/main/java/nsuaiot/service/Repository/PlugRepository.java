@@ -11,4 +11,6 @@ public interface PlugRepository extends JpaRepository<Plug, Integer> {
     Optional<Plug> findByPlugIdAndOwnerId(String plugId,String ownerId);
     boolean existsByPlugId(String plugId);
     Optional<List<Plug>> findByOwnerId(String ownerId);
+
+    Plug findByPlugId(String plugId);
 }

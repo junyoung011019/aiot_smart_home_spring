@@ -2,6 +2,7 @@ package nsuaiot.service.Controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
+import nsuaiot.service.DTO.ApiResponse;
 import nsuaiot.service.DTO.UserTokenDTO;
 import nsuaiot.service.Entity.User;
 import nsuaiot.service.Repository.UserRepository;
@@ -20,23 +21,12 @@ public class KakaoController {
 
     private final KakaoService kakaoService;
 
-    //카카오 인가코드 -> 사용자 조회(DB 조회) -> 토큰 발급
+    //플러터 및 빅스비 캡슐 콜백
     @Transactional(readOnly = false)
-    @GetMapping("/callback")
-    public ResponseEntity<?> kakaoCallback(@RequestParam String code) throws JsonProcessingException {
-        //카카오 (인가코드 -> 액세스 토큰)
-        String accessToken = kakaoService.getToken(code);
-        //카카오 (액세스 토큰 -> 사용자 아이디 조회)
+    @GetMapping("/login")
+    public ResponseEntity<?> flutterCallback(@RequestParam String accessToken, String fcmKey) throws JsonProcessingException {
         String kakaoUserId = kakaoService.getUserInfo(accessToken);
-        return kakaoService.getRedirectURL(kakaoUserId);
-    }
-
-    //플러터용 콜백
-    @Transactional(readOnly = false)
-    @GetMapping("/flutter")
-    public ResponseEntity<?> flutterCallback(@RequestParam String accessToken) throws JsonProcessingException {
-        String kakaoUserId = kakaoService.getUserInfo(accessToken);
-        return kakaoService.getUserByKakaoUserId(kakaoUserId);
+        return kakaoService.getUserByKakaoUserId(kakaoUserId, fcmKey);
     }
 
 

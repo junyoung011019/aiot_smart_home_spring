@@ -1,4 +1,11 @@
 spring:
+  redis:
+    password: "1q2w3e4r!"
+
+  data:
+    mongodb:
+      uri: mongodb://kidjjy:1q2w3e4r%21@3.35.21.90:27017/IoT?authSource=admin
+
   security:
     oauth2:
       client:
@@ -23,4 +30,22 @@ jwt:
     refresh: "myRefreshTokenIsEnoughLongRefreshTokenWhatIsProblem"
 
 heyhome:
-  token: "ba4033b0-778d-4480-8c55-558bfa1a16dc"
+  token: "5edfd77b-0e73-4a99-a81a-c5d9422fcde0"
+
+python:
+#  path: "/var/www/python/venv/bin/python"
+  path: "D:\\Coding\\notice\\.venv\\Scripts\\python.exe"
+  code_notification_path: "/var/www/python/dash"
+  code_path: "D:/Coding/notice"
+#  code_one_line_path: "/var/www/python/oneAdvice"
+  code_one_line_path: "D:/Coding/oneAdvice"
+
+
+
+pdf:
+  terms: "/var/www/spring/pdf/개인정보처리방침.pdf"
+  #terms: "C:/pdf/개인정보처리방침.pdf"
+  privacy: "/var/www/spring/pdf/서비스이용약관(자사 제품, 서비스 공급용).pdf"
+  #privacy: "C:/pdf/서비스이용약관(자사 제품, 서비스 공급용).pdf"
+
+

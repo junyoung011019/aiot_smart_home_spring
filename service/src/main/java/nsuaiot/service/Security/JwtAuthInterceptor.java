@@ -41,7 +41,6 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
         }
 
         String requestURI = request.getServletPath();
-        System.out.println("요청 주소 : "+ requestURI);
         //예외 주소일때
         if (EXCLUDED_PATHS.contains(requestURI)) {
             return true;

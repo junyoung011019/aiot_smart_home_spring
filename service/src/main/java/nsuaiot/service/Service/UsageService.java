@@ -1,28 +1,33 @@
 package nsuaiot.service.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import nsuaiot.service.DTO.ApiResponse;
-import nsuaiot.service.DTO.UsageRequest;
 import nsuaiot.service.Entity.Plug;
+import nsuaiot.service.Entity.Usage;
 import nsuaiot.service.Repository.PlugRepository;
+import nsuaiot.service.Repository.UsageRepository;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.TimeZone;
+
+import java.util.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 
 @Service
 @RequiredArgsConstructor
@@ -30,201 +35,234 @@ public class UsageService {
 
     private final RestTemplate restTemplate;
     private final PlugRepository plugRepository;
+    private final UsageRepository usageRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    //헤이홈 서버로의 Get 요청
-    private String getApiCall(String url) throws JSONException {
-        String token = "ba4033b0-778d-4480-8c55-558bfa1a16dc";
-        HttpHeaders headers=new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-        HttpEntity<String> requestEntity1 = new HttpEntity<>(headers);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        ResponseEntity<String> apiResponse = restTemplate.exchange(url, HttpMethod.GET, requestEntity1, String.class);
-        return apiResponse.getBody();
-    }
-
-    //Json 데이터 포맷팅
-    public List<UsageRequest> usageDataFormatting(String usage) throws JsonProcessingException {
-            try {
-                List<UsageRequest> usageList= objectMapper.readValue(usage, new TypeReference<List<UsageRequest>>() {});
-                return usageList;
-            } catch (IOException e) {
-                throw new RuntimeException("JSON Parsing Error", e);
-            }
+    public JSONArray usageDataFormatting(List<Usage> usageDate) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        formatter.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+        JSONArray returnData = new JSONArray();
+        for (int i = 0; i < usageDate.size(); i++) {
+            Usage usage = usageDate.get(i);
+            JSONObject object = new JSONObject()
+                    .put("usage", usage.getUsageValue())
+                    .put("date", formatter.format(usage.getUsageDate()));
+            returnData.put(object);
+        }
+        return returnData;
     }
 
 
     //주간 단일 기기 사용량 조회
-    public ResponseEntity<?> weekUsagePlug(String plugId, String userId) throws JsonProcessingException {
-        
+    public ResponseEntity<?> weekUsagePlug(String plugId, String userId) throws IOException, InterruptedException {
+
         //플러그 ID 유무 확인
-        if(plugRepository.findByPlugIdAndOwnerId(plugId,userId).isEmpty()){
+        if (plugRepository.findByPlugIdAndOwnerId(plugId, userId).isEmpty()) {
             return ResponseEntity.status(404).body(new ApiResponse("플러그 ID가 올바르지 않습니다."));
         }
-        
-        //현재로부터 7일 확인 및 url 생성
-        LocalDate end = LocalDate.now();
-        LocalDate start = end.minusDays(6);
-        String endDate = end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String startDate = start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String url = "https://goqual.io/openapi/devices/plug/"+plugId+"/history?startDate="+startDate+"&endDate="+endDate;
-        String response = getApiCall(url);
 
-        if(response.isEmpty()){
+        //현재로부터 7일 확인
+        LocalDateTime startDate = LocalDateTime.now().minusDays(7);
+        Date start = Date.from(startDate.atZone(ZoneId.of("Asia/Seoul")).toInstant());
+        LocalDateTime endDate = LocalDateTime.now().minusDays(1);
+        Date end = Date.from(endDate.atZone(ZoneId.of("Asia/Seoul")).toInstant());
+
+        List<Usage> usageData = usageRepository.findByPlugIdAndUsageDateBetween(plugId, start, end);
+
+        if (usageData.isEmpty()) {
             return ResponseEntity.status(204).body(new ApiResponse("플러그의 사용량이 없습니다"));
         }
-        return ResponseEntity.ok(response);
+
+
+
+        JSONObject returnData = new JSONObject()
+                .put("usage",usageDataFormatting(usageData).toString());
+        return ResponseEntity.ok().body(returnData.toString());
     }
 
 
     //주간 단체 기기 사용량 조회 : 각 기기 별의 전력량 합 (이번주 사용량 ~7일)
-    public ResponseEntity<?> weekUsageGroupPlug(String userId) throws JsonProcessingException {
+    public ResponseEntity<?> weekUsageGroupPlug(String userId) throws IOException, InterruptedException {
 
-        //현재로부터 7일 확인 및 url 생성
-        LocalDate end = LocalDate.now();
-        LocalDate start = end.minusDays(6);
-        String endDate = end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String startDate = start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        //현재로부터 7일 확인
+        LocalDateTime startDate = LocalDateTime.now().minusDays(7);
+        Date start = Date.from(startDate.atZone(ZoneId.of("Asia/Seoul")).toInstant());
+        LocalDateTime endDate = LocalDateTime.now().minusDays(1);
+        Date end = Date.from(endDate.atZone(ZoneId.of("Asia/Seoul")).toInstant());
 
         //userId에 해당하는 플러그 정보 가져오기
         Optional<List<Plug>> optionalPlugList = plugRepository.findByOwnerId(userId);
-        if(optionalPlugList.isEmpty()){
+        if (optionalPlugList.isEmpty()) {
             return ResponseEntity.status(204).body(new ApiResponse("조회할 기기가 없습니다."));
         }
+
         List<Plug> plugList = optionalPlugList.get();
+        JSONObject returnData = new JSONObject().put("message", start + "부터 " + end + "까지의 전력 데이터");
+        JSONArray totalPlugData = new JSONArray();
+        for (Plug plug : plugList) {
+            List<Usage> usageData = usageRepository.findByPlugIdAndUsageDateBetween(plug.getPlugId(), start, end);
 
-        JSONArray plugsUsageData = new JSONArray().put(new JSONObject().put("message", startDate +"부터 "+endDate+"까지의 전력 데이터"));
-        
-        //플러그 리스트에서 플러그 ID 조회
-        for(int i=0;i<plugList.size();i++){
-            Plug plugData = plugList.get(i);
-            String plugId = plugData.getPlugId();
-
-            String url = "https://goqual.io/openapi/devices/plug/"+plugId+"/history?startDate="+startDate+"&endDate="+endDate;
-            String response = getApiCall(url);
-            List<UsageRequest> usageList = usageDataFormatting(response);
-
-            double usageTotal = 0;
-            for(UsageRequest usage : usageList){
-                usageTotal+=usage.getUsage();
+            double total_usage = 0.0;
+            for (Usage usage : usageData) {
+                total_usage += usage.getUsageValue();
             }
-            JSONObject plugUsageData = new JSONObject().put("plugId",plugId)
-                    .put("plugName",plugData.getPlugName())
-                            .put("usage",usageTotal);
-            plugsUsageData.put(plugUsageData);
+            JSONObject plugData = new JSONObject()
+                    .put("plugName", plug.getPlugName())
+                    .put("plugId", plug.getPlugId())
+                    .put("usage", total_usage);
+
+            totalPlugData.put(plugData);
+        }
+        returnData.put("plugUsageData", totalPlugData)
+                .put("advice",aiAdvicePython("device"));
+
+        if (returnData.isEmpty()) {
+            return ResponseEntity.status(204).body(new ApiResponse("플러그의 사용량이 없습니다"));
         }
 
-        return ResponseEntity.ok(plugsUsageData.toString());
+        return ResponseEntity.ok(returnData.toString());
     }
 
 
     //주간 사용량 조회 (7일간 매일 각각 얼마나 썼는지)
-    public ResponseEntity<?> weekUsage(String userId) throws JsonProcessingException {
+    public ResponseEntity<?> weekUsage(String userId) throws IOException, InterruptedException {
 
-        //현재로부터 7일 확인 및 url 생성
-        LocalDate end = LocalDate.now();
-        LocalDate start = end.minusDays(6);
-        String endDate = end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String startDate = start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        //현재로부터 7일 확인
+        LocalDateTime startDate = LocalDateTime.now().minusDays(7);
+        Date start = Date.from(startDate.atZone(ZoneId.of("Asia/Seoul")).toInstant());
+        LocalDateTime endDate = LocalDateTime.now().minusDays(1);
+        Date end = Date.from(endDate.atZone(ZoneId.of("Asia/Seoul")).toInstant());
 
         //(토큰) 사용자에 해당하는 플러그만 가져옴
         Optional<List<Plug>> optionalPlugList = plugRepository.findByOwnerId(userId);
-        if(optionalPlugList.isEmpty()){
+        if (optionalPlugList.isEmpty()) {
             return ResponseEntity.status(204).body(new ApiResponse("조회할 기기가 없습니다."));
         }
 
-        //주간 전력량 데이터 저장소
-        Map<String, Double> weekUsageMap = new HashMap<>();
+        Map<String, Double> weekData = new TreeMap<>();
 
-        for(Plug plug : optionalPlugList.get()){
-            String plugId = plug.getPlugId();
-            String url = "https://goqual.io/openapi/devices/plug/"+plugId+"/history?startDate="+startDate+"&endDate="+endDate;
-            String response = getApiCall(url);
-            List<UsageRequest> usageList = usageDataFormatting(response);
+        for (Plug plug : optionalPlugList.get()) {
+            List<Usage> usageData = usageRepository.findByPlugIdAndUsageDateBetween(plug.getPlugId(), start, end);
+            //한 기기가 날마다 얼마나 썼는지
+            for (Usage usage : usageData) {
 
-            for(UsageRequest usage : usageList){
-                String week =usage.getDate().substring(0,10);
-                if(weekUsageMap.containsKey(week)){
-                    double weekUsageData = weekUsageMap.get(week);
-                    weekUsageMap.put(week, weekUsageData +usage.getUsage());
-                }else{
-                    weekUsageMap.put(week,usage.getUsage());
+                //날짜 Date -> String 변환
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                formatter.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+                String date = formatter.format(usage.getUsageDate());
+
+                //맵안에 날짜 데이터 있는지 판단 (없으면 추가)
+                if (!weekData.containsKey(date)) {
+                    weekData.put(date, 0.0);
                 }
+                double newData = weekData.get(date) + usage.getUsageValue();
+                weekData.put(date, newData);
             }
         }
 
+        JSONObject returnData = new JSONObject()
+                .put("message", start + "부터 " + end + "까지의 전력 데이터")
+                .put("weekUsage", new JSONObject(weekData))
+                .put("advice",aiAdvicePython("daily"));
 
-        List<Map<String, Object>> formattedData = weekUsageMap.entrySet().stream()
-                .map(entry -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("date", entry.getKey());
-                    // 소수점 3자리 반올림
-                    map.put("usage", Math.round(entry.getValue() * 1000) / 1000.0);
-                    return map;
-                })
-                .collect(Collectors.toList());
-
-        // JSON 출력 (Jackson 사용)
-        ObjectMapper objectMapper = new ObjectMapper();
-        String returnData = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(formattedData);
-
-
-        return ResponseEntity.ok(returnData);
+        return ResponseEntity.ok(returnData.toString());
     }
 
 
     //월간 사용량 조회 (6개월 간의 월간 데이터)
-    public ResponseEntity<?> monthUsage(String userId) throws JsonProcessingException {
+    public ResponseEntity<?> monthUsage(String userId) throws IOException, InterruptedException {
+        //현재로부터 7일 확인
+        LocalDateTime startDate = LocalDateTime.of(2024, 9, 1, 0, 0);
+        Date start = Date.from(startDate.atZone(ZoneId.of("Asia/Seoul")).toInstant());
+        LocalDateTime endDate = LocalDateTime.now().minusDays(1);
+        Date end = Date.from(endDate.atZone(ZoneId.of("Asia/Seoul")).toInstant());
 
-        //현재로부터 200일 확인 및 url 생성
-        LocalDate end = LocalDate.now();
-        LocalDate start = end.minusDays(200);
-        String endDate = end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String startDate = start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        
         //(토큰) 사용자에 해당하는 플러그만 가져옴
         Optional<List<Plug>> optionalPlugList = plugRepository.findByOwnerId(userId);
-        if(optionalPlugList.isEmpty()){
+        if (optionalPlugList.isEmpty()) {
             return ResponseEntity.status(204).body(new ApiResponse("조회할 기기가 없습니다."));
         }
 
-        //월간 전력량 데이터 저장소
-        Map<String, Double> monthUsageMap = new HashMap<>();
+        Map<String, Double> monthData = new TreeMap<>();
 
-        for(Plug plug : optionalPlugList.get()){
-            String plugId = plug.getPlugId();
-            String url = "https://goqual.io/openapi/devices/plug/"+plugId+"/history?startDate="+startDate+"&endDate="+endDate;
-            String response = getApiCall(url);
-            List<UsageRequest> usageList = usageDataFormatting(response);
+        for (Plug plug : optionalPlugList.get()) {
+            List<Usage> usageData = usageRepository.findByPlugIdAndUsageDateBetween(plug.getPlugId(), start, end);
+            //한 기기가 날마다 얼마나 썼는지
+            for (Usage usage : usageData) {
 
-            for(UsageRequest usage : usageList){
-                String month =usage.getDate().substring(0,7);
-                if(monthUsageMap.containsKey(month)){
-                    double monthUsageDate = monthUsageMap.get(month);
-                    monthUsageMap.put(month,monthUsageDate+usage.getUsage());
-                }else{
-                    monthUsageMap.put(month,usage.getUsage());
+                //날짜 Date -> String 변환
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM");
+                formatter.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+                String date = formatter.format(usage.getUsageDate());
+
+                //맵안에 날짜 데이터 있는지 판단 (없으면 추가)
+                if (!monthData.containsKey(date)) {
+                    monthData.put(date, 0.0);
                 }
+                double newData = monthData.get(date) + usage.getUsageValue();
+                monthData.put(date, newData);
             }
         }
+        JSONObject returnData = new JSONObject()
+                .put("message", start + "부터 " + end + "까지의 전력 데이터")
+                .put("monthData", new JSONObject(monthData))
+                .put("advice",aiAdvicePython("monthly"));
 
-
-        List<Map<String, Object>> formattedData = monthUsageMap.entrySet().stream()
-                .map(entry -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("date", entry.getKey());
-                    // 소수점 3자리 반올림
-                    map.put("usage", Math.round(entry.getValue() * 1000) / 1000.0);
-                    return map;
-                })
-                .collect(Collectors.toList());
-
-        // JSON 출력 (Jackson 사용)
-        ObjectMapper objectMapper = new ObjectMapper();
-        String returnData = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(formattedData);
-
-
-        return ResponseEntity.ok(returnData);
+        return ResponseEntity.ok(returnData.toString());
     }
 
+    //파이썬 코드
+    @Value("${python.path}")
+    private String PYTHON_PATH;
+
+    @Value("${python.code_one_line_path}")
+    private String PYTHON_CODE_PATH;
+
+    //파이썬 코드 실행
+    public String aiAdvicePython(String type) throws IOException, InterruptedException {
+        //AI 조언 봇 실행
+        Process process = null;
+        try {
+            ProcessBuilder pb = new ProcessBuilder(PYTHON_PATH, "main.py",type);
+            pb.directory(new File(PYTHON_CODE_PATH));
+            process = pb.start();
+        } catch (Exception e) {
+            System.out.println("실행 오류 : "+e.getMessage());
+            return "실행 오류";
+        }
+
+        // 결과 저장용 StringBuilder
+        StringBuilder output = new StringBuilder();
+
+        // 결과 읽기
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)
+        );
+        String line;
+        while ((line = reader.readLine()) != null) {
+            output.append(line).append("\n");
+        }
+
+        int exitCode = process.waitFor();
+
+        String result = output.toString().trim();
+
+        BufferedReader errReader = new BufferedReader(
+                new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8)
+        );
+        StringBuilder errOutput = new StringBuilder();
+        String errLine;
+        while ((errLine = errReader.readLine()) != null) {
+            errOutput.append(errLine).append("\n");
+        }
+
+        if (errOutput.length() > 0) {
+            System.out.println("❗ Python stderr: " + errOutput.toString());
+        }
+
+        if (result.isEmpty()) {
+            return null;
+        }
+        return result;
+    }
 }
