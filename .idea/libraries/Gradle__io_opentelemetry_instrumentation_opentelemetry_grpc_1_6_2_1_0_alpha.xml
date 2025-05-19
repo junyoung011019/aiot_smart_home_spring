@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: io.opentelemetry.instrumentation:opentelemetry-grpc-1.6:2.1.0-alpha" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="io.opentelemetry.instrumentation" artifactId="opentelemetry-grpc-1.6" version="2.1.0-alpha" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.opentelemetry.instrumentation/opentelemetry-grpc-1.6/2.1.0-alpha/2b5664e141c3a2cfddc922d8ce3e8ac7aeb9ebc0/opentelemetry-grpc-1.6-2.1.0-alpha.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.opentelemetry.instrumentation/opentelemetry-grpc-1.6/2.1.0-alpha/2678b7049694196208388c17c0ce30b7d88dc0fc/opentelemetry-grpc-1.6-2.1.0-alpha-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

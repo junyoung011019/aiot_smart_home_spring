@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.cloud.opentelemetry:shared-resourcemapping:0.33.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.google.cloud.opentelemetry" artifactId="shared-resourcemapping" version="0.33.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.cloud.opentelemetry/shared-resourcemapping/0.33.0/9c4f5ed770ccf34c3e78adadd979227fb9105de3/shared-resourcemapping-0.33.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.cloud.opentelemetry/shared-resourcemapping/0.33.0/85b18042751041c0fadc797f8c208f8d301f3bb6/shared-resourcemapping-0.33.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

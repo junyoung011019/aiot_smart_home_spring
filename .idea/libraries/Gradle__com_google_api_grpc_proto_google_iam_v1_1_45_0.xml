@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.api.grpc:proto-google-iam-v1:1.45.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.google.api.grpc" artifactId="proto-google-iam-v1" version="1.45.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.api.grpc/proto-google-iam-v1/1.45.0/714627fc4093937996ec1417309f3811b4d0e3ce/proto-google-iam-v1-1.45.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.api.grpc/proto-google-iam-v1/1.45.0/d06a6bdccaf5da8f63e432bc19892aebe9ddb1e6/proto-google-iam-v1-1.45.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

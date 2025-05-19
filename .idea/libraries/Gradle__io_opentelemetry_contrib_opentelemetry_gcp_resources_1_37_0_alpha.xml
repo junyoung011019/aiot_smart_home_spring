@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: io.opentelemetry.contrib:opentelemetry-gcp-resources:1.37.0-alpha" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="io.opentelemetry.contrib" artifactId="opentelemetry-gcp-resources" version="1.37.0-alpha" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.opentelemetry.contrib/opentelemetry-gcp-resources/1.37.0-alpha/e2e4f1932bdc40aa9f38d746652712152e3f3fa1/opentelemetry-gcp-resources-1.37.0-alpha.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.opentelemetry.contrib/opentelemetry-gcp-resources/1.37.0-alpha/9e9a4cba83a72a4486ddfa9bc48906bdcda2fde1/opentelemetry-gcp-resources-1.37.0-alpha-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

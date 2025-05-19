@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.api.grpc:grpc-google-cloud-storage-v2:2.46.0-beta" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.google.api.grpc" artifactId="grpc-google-cloud-storage-v2" version="2.46.0-beta" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.api.grpc/grpc-google-cloud-storage-v2/2.46.0-beta/532b472d938e65cdae3440fbe4e18eb3f6dc732b/grpc-google-cloud-storage-v2-2.46.0-beta.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.api.grpc/grpc-google-cloud-storage-v2/2.46.0-beta/f5d80b91102825877c92d5cea8c193756ee91364/grpc-google-cloud-storage-v2-2.46.0-beta-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

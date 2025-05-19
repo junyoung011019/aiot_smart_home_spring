@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.mongodb:mongodb-driver-sync:5.2.1" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.mongodb" artifactId="mongodb-driver-sync" version="5.2.1" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mongodb/mongodb-driver-sync/5.2.1/c837fdf64de3e0211553e1f28ae433ab245fbbc2/mongodb-driver-sync-5.2.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mongodb/mongodb-driver-sync/5.2.1/af99025218bb85c6b815eacd59d1e79159391ec1/mongodb-driver-sync-5.2.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

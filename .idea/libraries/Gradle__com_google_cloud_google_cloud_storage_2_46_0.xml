@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.cloud:google-cloud-storage:2.46.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.google.cloud" artifactId="google-cloud-storage" version="2.46.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.cloud/google-cloud-storage/2.46.0/220d0f74e70777d5e445fd88f64344011a665e9f/google-cloud-storage-2.46.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.cloud/google-cloud-storage/2.46.0/4610d9b9169ba2ea4910289ff18a14f83b78c69/google-cloud-storage-2.46.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

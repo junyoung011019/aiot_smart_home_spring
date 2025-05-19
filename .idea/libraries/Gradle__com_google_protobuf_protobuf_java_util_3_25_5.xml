@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.protobuf:protobuf-java-util:3.25.5" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.google.protobuf" artifactId="protobuf-java-util" version="3.25.5" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.protobuf/protobuf-java-util/3.25.5/38cc5ce479603e36466feda2a9f1dfdb2210ef00/protobuf-java-util-3.25.5.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.protobuf/protobuf-java-util/3.25.5/c1c4a59a712e9670e7f1f636dfc11e266e6640a6/protobuf-java-util-3.25.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

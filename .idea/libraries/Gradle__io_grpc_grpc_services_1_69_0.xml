@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: io.grpc:grpc-services:1.69.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="io.grpc" artifactId="grpc-services" version="1.69.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.grpc/grpc-services/1.69.0/bcd917dad2380ee7cf4728da33816ffb9fad6b8b/grpc-services-1.69.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.grpc/grpc-services/1.69.0/734b2f944dba38ebb7ec36e63b7c09bd7d0cd28f/grpc-services-1.69.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
