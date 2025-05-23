@@ -37,4 +37,4 @@ out/
 .vscode/
 
 #sdk
-finalproject-firebase-adminsdk.json
+**/finalproject-firebase-adminsdk.json
