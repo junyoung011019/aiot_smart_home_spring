@@ -4,6 +4,10 @@
 
 > ### [📁 프로젝트 논문 보기](https://drive.google.com/file/d/1zogCa5vQ674gPMHO9FeUQh_ujM1negOy/view?usp=sharing) 
 
+https://youtu.be/dMZLcfVnr4k
+
+> ### [📌 유튜브 시연 영상 보기](https://youtu.be/ZMaegZ8kPBg?si=-OLllSi7j72tb1pg) 
+
 <br>
 
 ## 🌟 프로젝트 소개
@@ -277,44 +281,193 @@ DB에 저장된 해시 값과 비교하는 2차 검증 로직을 추가하여 �
 <table>
   <tr>
     <td align="center">
-      <img src="./asset/회원가입.png" width="400px"><br>
-      <sub>회원가입</sub>
+      <img src="./asset/로그인.jpg" width="200px"><br>
+      <sub>로그인</sub>
     </td>
     <td align="center">
-      <img src="./asset/로그인.png" width="400px"><br>
-      <sub>로그인</sub>
+      <img src="./asset/카카오로그인.png" width="200px"><br>
+      <sub>회원가입</sub>
+    </td>
+    <td>
+      ⭐ 기능 설명 <br><br>
+       - OAuth 2.0 기반 카카오 로그인 도입<br>
+       - 안전하고, 편리한 인증 시스템 구축
     </td>
   </tr>
 </table>
 
   ### 메인 화면
 
-  ### 기기 제어
+<table>
+  <tr>
+    <td align="center">
+      <img src="./asset/메인화면.jpg" width="200px"><br>
+      <sub>메인화면</sub>
+    </td>
+    <td>
+      ⭐ 기능 설명 <br><br>
+       - 한전 API를 통한 실시간 전기 요금 확인<br>
+       - 파이 차트를 통한, 이번달 기기 사용 분표 확인
+    </td>
+  </tr>
+</table>
 
+  ### 기기 (그룹) 제어
 
-  ### 그룹 기능
+<table>
+  <tr>
+    <td align="center">
+      <img src="./asset/기기제어.jpg" width="200px"><br>
+      <sub>기기제어</sub>
+    </td>
+    <td align="center">
+      <img src="./asset/그룹설정.png" width="200px"><br>
+      <sub>그룹제어</sub>
+    </td>
+    <td>
+      ⭐ 기능 설명 <br>
+       - 실시간 원격 제어<br>
+       - (그룹 기능) 필요한 기기끼리 묶어서 한번에 제어
+    </td>
+  </tr>
+</table>
 
+  ### 사용량 조회
 
-  ### 그룹 액션 기능
+<table>
+  <tr>
+    <td align="center">
+      <img src="./asset/사용량 그래프.jpg" width="200px"><br>
+      <sub>사용량 그래프</sub>
+    </td>
+    <td>
+      ⭐ 기능 설명 <br><br>
+       - 기기별 / 일별 / 월별 전력 사용량 추이 비교<br>
+       - 한줄 조언을 통해, 개인 맞춤형 조언 제공
+    </td>
+  </tr>
+</table>
 
+  ### AI 조언
 
-  ### 기기 조회
+<table>
+  <tr>
+    <td align="center">
+      <img src="./asset/대시보드.jpg" width="200px"><br>
+      <sub>대시보드</sub>
+    </td>
+    <td align="center">
+      <img src="./asset/푸시 알림.jpg" width="200px"><br>
+      <sub>푸시 알림</sub>
+    </td>
+    <td>
+      ⭐ 기능 설명 <br>
+      - 대시보드<br>
+       1일전 VS 2일전 사용 비교 / 기기별 세부 조언
+      <br>
+      - 푸시 알림<br>
+       정시 30분마다, 실시간 작동 기기 판단 후 조언 전달
+    </td>
+  </tr>
+</table>
 
+### 빅스비 로그인
 
-  ### 전력량 조회
+<table>
+  <tr>
+    <td align="center">
+      <img src="./asset/bixby_메인.jpg" width="200px"><br>
+      <sub>bixby 로그인</sub>
+    </td>
+    <td>
+      ⭐ 기능 설명  <br>
+       - OAuth 2.0 기반 카카오 로그인 도입<br>
+       - 안전하고, 편리한 인증 시스템 구축
+    </td>
+  </tr>
+</table>
+
+### 빅스비 기기(그룹) 조회
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="./asset/bixby_기기상태조회.jpg" width="200px"><br>
+      <sub>기기 상태 조회</sub>
+    </td>
+    <td align="center">
+      <img src="./asset/bixby_그룹조회.jpg" width="200px"><br>
+      <sub>그룹조회</sub>
+    </td>
+    <td>
+      ⭐ 기능 설명 <br>
+      - 기기 상태 조회 <br>
+      - 앱에 등록된 그룹 조회
+    </td>
+  </tr>
+</table>
+
+### 빅스비 기기(그룹) 제어
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="./asset/bixby_기기제어.jpg" width="200px"><br>
+      <sub>기기제어</sub>
+    </td>
+    <td align="center">
+      <img src="./asset/bixby_그룹실행.jpg" width="200px"><br>
+      <sub>그룹제어</sub>
+    </td>
+    <td>
+      ⭐ 기능 설명 <br>
+      - 기기 제어<br>
+      - 그룹 실행
+    </td>
+  </tr>
+</table>
 
 <br>
 
 ## 8. 📌 추후 고려 사항
 
-- 추가 보완 사항
+- <strong> 빅데이터 형성 </strong>
     
+  장기간 전력 데이터를 수집해서, OpenAI가 아닌 실제 AI 학습 및 활용
 
-- 보안적인 측면
+- <strong> 대규모 트래픽 처리 </strong>
+
+  실제 서비스의 규모(여러 사용자, 개인 맞춤형 AI 학습)를 고려해서 Load Balacner 등을 활용한 트래픽 분산 및 처리
+
+- <strong> 대기 전력 차단 가능한 플러그 활용 </strong>
+
+  상위 모델인 대기 전력 차단 플러그를 활용해, 대기 전력 차단
+
+- <strong> 공식 앱 출시 </strong>
     
+  플레이스토어에 공식 앱 출시해 정식 활용
 
 <br>
 
 ## 9. 🤔 프로젝트 회고
 
+- 백엔드 개발부터, 
+
+  멀티 클라이언트(앱과 빅스비)의 요청에 대한 Restful API 설계를 해본 경험이라 뜻 깊었다.
+
+  Spring은 Node.js와 다르게 프레임워크 자체로 구조적으로 설계가 되어있어 처음에 이해하는 부분은 어려웠지만, 조금 익숙해지니 편리하다고 느꼈다.(물론 많이 부족하겠지만)
+
+  
+- AWS 클라우드 배포까지
+
+    GCP만 써보고 처음으로 AWS를 써보는 경험인데, GCP가 공식 문서가 더 친절한 것 같다.
+
+    클라우드 자체의 구조는 비슷하므로, 하나를 집중적으로 공부해야해서 SAA 자격증도 시도해봐야겠다.
+
+- 하나의 서비스 구현
+
+  사용자 요구사항 분석부터 설계 및 구현까지 모든 개발 과정을 진행할 수 있어서 좋았다.
+
+  또한 공공 데이터 포털이 아닌, 외부 API를 활용한 경험이라 더 의미 있었다.
+  
 
