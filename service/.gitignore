@@ -39,5 +39,5 @@ out/
 #sdk
 **/finalproject-firebase-adminsdk.json
 
-application.properties
-application.yml
+**/application.properties
+**/application.yml
