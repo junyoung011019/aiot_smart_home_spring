@@ -41,3 +41,5 @@ out/
 
 **/application.properties
 **/application.yml
+
+/out/
